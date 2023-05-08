@@ -88,7 +88,8 @@ node_t *rbtree_max(const rbtree *t) {
 }
 
 int rbtree_erase(rbtree *t, node_t *p) {
-  // TODO: implement erase
+  t->root = t->nil;
+
   return 0;
 }
 
