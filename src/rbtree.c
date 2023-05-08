@@ -56,8 +56,25 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
 }
 
 node_t *rbtree_find(const rbtree *t, const key_t key) {
-  // TODO: implement find
+  node_t *current = t ->root;
+
+  while (current != t->nil)
+  {
+    if (key == current->key)
+    {
   return t->root;
+}
+    else if (key > current->key)
+    {
+      current = current -> right;
+    }
+    else 
+    {
+      current = current -> left;
+    }
+  }
+  
+  return NULL;
 }
 
 node_t *rbtree_min(const rbtree *t) {
