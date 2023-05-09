@@ -175,9 +175,16 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
   return NULL;
 }
 
+// 가장 왼쪽으로 이동한다.
 node_t *rbtree_min(const rbtree *t) {
-  // TODO: implement find
-  return t->root;
+  node_t *current = t->root;
+  
+  while (current->left != t->nil)
+  {
+    current = current->left;
+    // printf("now: %d\n", current->key);
+  }
+  return current;
 }
 
 node_t *rbtree_max(const rbtree *t) {
