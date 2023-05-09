@@ -97,3 +97,17 @@ int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
   // TODO: implement to_array
   return 0;
 }
+
+void print_rbtree(const rbtree *t, const node_t *node) {
+  if (node == t->nil)
+  {
+    printf("%s", "nil\n");
+  }
+  else{
+    printf("%d \n", node->key);
+    printf("%s", "left: ");
+    print_rbtree(t, node->left);
+    printf("%s", "right: ");
+    print_rbtree(t ,node->right);
+  }
+}
