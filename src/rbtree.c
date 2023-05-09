@@ -45,14 +45,58 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
   {
     t->root = new_node;
   }
-  else if (key < temp->key)
+// 왼쪽으로 회전하는 경우
+void *left_rotate(rbtree *t, node_t *new_node) {
+  node_t *temp = new_node->right;
+  new_node->right = temp->left;
+
+  if (temp->left != t->nil)
   {
-    temp->left = new_node;
-  } else {
-    temp->right = new_node;
+    temp->left->parent = new_node;
   }
+  temp->parent = new_node->parent;
+
+  if (new_node->parent == t->nil)
+  {
+    t->root = temp;
+  }
+  else if (new_node == new_node->parent->left)
+  {
+    new_node->parent->left = temp;
+  }
+  else
+  {
+    new_node->parent->right = temp;
+  }
+    temp->left = new_node;
+  new_node->parent = temp;
+  }
+
+// 오른쪽으로 회전하는 경우
+void *right_rotate(rbtree *t, node_t *new_node) {
+  node_t *temp = new_node->left;
+  new_node->left = temp->right;
+
+  if (temp->right != t->nil)
+  {
+    temp->right->parent = new_node;
+  }
+  temp->parent = new_node->parent;
   
-  return t->root;
+  if (new_node->parent == t->nil)
+  {
+    t->root = temp;
+  }
+  else if (new_node == new_node->parent->right)
+  {
+    new_node->parent->right = temp;
+  }
+  else
+  {
+    new_node->parent->left = temp;
+  }
+  temp->right = new_node;
+  new_node->parent = temp;  
 }
 
 node_t *rbtree_find(const rbtree *t, const key_t key) {
