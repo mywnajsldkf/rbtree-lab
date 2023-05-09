@@ -45,6 +45,60 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
   {
     t->root = new_node;
   }
+node_t *rbtree_insert_fixup(rbtree *t, node_t *new_node) {
+  while (new_node->parent->color == RBTREE_RED)
+  {
+    if (new_node->parent == new_node->parent->parent->left)
+    {
+      // new_node의 삼촌노드 색상을 확인한다.
+      node_t *temp = new_node->parent->parent->right;
+      // case1) recoloring case
+      if (temp->color == RBTREE_RED)
+      {
+        // recoloring
+        new_node->parent->color = RBTREE_BLACK;
+        temp->color = RBTREE_BLACK;
+        new_node->parent->parent->color = RBTREE_RED;
+        new_node = new_node->parent->parent;
+      }
+      else {
+      if (new_node == new_node->parent->right)
+      {
+        new_node = new_node->parent;
+        left_rotate(t, new_node);
+      }
+      new_node->parent->color = RBTREE_BLACK;
+      new_node->parent->parent->color = RBTREE_RED;
+      right_rotate(t, new_node->parent->parent);  
+      }
+    }
+    // 반대쪽에 있는 경우
+    else
+    {
+      node_t *temp = new_node->parent->parent->left;
+      if (temp->color == RBTREE_RED)
+      {
+        new_node->parent->color = RBTREE_BLACK;
+        temp->color = RBTREE_BLACK;
+        new_node->parent->parent->color = RBTREE_RED;
+        new_node = new_node->parent->parent;
+      }
+      else {
+      if (new_node == new_node->parent->left)
+      {
+        new_node = new_node->parent;
+        right_rotate(t, new_node);
+      }
+      new_node->parent->color = RBTREE_BLACK;
+      new_node->parent->parent->color = RBTREE_RED;
+      left_rotate(t, new_node->parent->parent);
+      }
+    }
+  }
+  t->root->color = RBTREE_BLACK;
+  return new_node;
+}
+
 // 왼쪽으로 회전하는 경우
 void *left_rotate(rbtree *t, node_t *new_node) {
   node_t *temp = new_node->right;
