@@ -58,11 +58,12 @@ node_t *rbtree_insert(rbtree *t, const key_t key) {
 node_t *rbtree_find(const rbtree *t, const key_t key) {
   node_t *current = t ->root;
 
+  // 현재 노드가 nil노드가 아닐 때까지
   while (current != t->nil)
   {
     if (key == current->key)
     {
-  return t->root;
+      return current;
 }
     else if (key > current->key)
     {
@@ -73,7 +74,6 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
       current = current -> left;
     }
   }
-  
   return NULL;
 }
 
