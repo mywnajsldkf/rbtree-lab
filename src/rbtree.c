@@ -226,6 +226,22 @@ node_t *tree_minimum(const rbtree *t, const node_t *p)
   return p;
 }
 
+int rb_transplant(rbtree *t, node_t *u, node_t *v)
+{
+  if (u->parent == t->nil)
+  {
+    t->root = v;
+  }
+  else if (u == u->parent->left)
+  {
+    u->parent->left = v;
+  }
+  else
+  {
+    u->parent->right = v;
+  }
+  v->parent = u->parent;
+
   return 0;
 }
 
