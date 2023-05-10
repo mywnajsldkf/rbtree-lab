@@ -25,6 +25,17 @@ void delete_rbtree(rbtree *t) {
   free(t);
 }
 
+void delete_node(rbtree *t, node_t *node) {
+  if (node->left != t->nil)
+  {
+    delete_node(t, node->left);
+  }
+  if (node->right != t->nil)
+  {
+    delete_node(t, node->right);
+  }  
+  free(node);  
+}
 node_t *rbtree_insert(rbtree *t, const key_t key) {
   node_t *new_node = (node_t *)calloc(1, sizeof(node_t));
 
