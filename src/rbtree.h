@@ -22,12 +22,19 @@ rbtree *new_rbtree(void);
 void delete_rbtree(rbtree *);
 
 node_t *rbtree_insert(rbtree *, const key_t);
+node_t *rbtree_insert_fixup(rbtree *, node_t *);
 node_t *rbtree_find(const rbtree *, const key_t);
 node_t *rbtree_min(const rbtree *);
 node_t *rbtree_max(const rbtree *);
+node_t *tree_minimum(const rbtree *, const node_t *);
 int rbtree_erase(rbtree *, node_t *);
 
 int rbtree_to_array(const rbtree *, key_t *, const size_t);
 
+void *left_rotate(rbtree *, node_t *);
+void *right_rotate(rbtree *, node_t *);
 void print_rbtree(const rbtree *, const node_t *);
+
+int rb_transplant(rbtree *, node_t *, node_t *);
+
 #endif  // _RBTREE_H_
