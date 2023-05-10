@@ -217,7 +217,14 @@ node_t *rbtree_max(const rbtree *t) {
 }
 
 int rbtree_erase(rbtree *t, node_t *p) {
-  t->root = t->nil;
+node_t *tree_minimum(const rbtree *t, const node_t *p)
+{
+  while (p->left != t->nil)
+  {
+    p = p->left;
+  }
+  return p;
+}
 
   return 0;
 }
