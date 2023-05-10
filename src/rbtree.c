@@ -36,43 +36,54 @@ void delete_node(rbtree *t, node_t *node) {
   }  
   free(node);  
 }
+
 node_t *rbtree_insert(rbtree *t, const key_t key) {
   node_t *new_node = (node_t *)calloc(1, sizeof(node_t));
-
   new_node->color = RBTREE_RED;
   new_node->key = key;
-  new_node->left = new_node->right = t->nil;
+  new_node->left = t->nil;
+  new_node->right = t->nil;
 
+  node_t *uncle = t->nil;   
   node_t *current = t->root;
-  node_t *temp = t->nil;
 
   while (current != t->nil)
   {
-    temp = current;
-    if (new_node->key < current->key)
+    uncle = current;
+    if (key < current->key)
     {
       current = current->left;
     } else {
       current = current->right;
     }
   }
-  new_node->parent = temp;
+  new_node->parent = uncle;
 
-  if (temp == t->nil)
+  if (uncle == t->nil)
   {
     t->root = new_node;
   }
+  else if (key < uncle->key)
+  {
+    uncle->left = new_node;
+  } else {
+    uncle->right = new_node;
+  }
+
+  rbtree_insert_fixup(t, new_node);
+
+  return new_node;
+}
+
 node_t *rbtree_insert_fixup(rbtree *t, node_t *new_node) {
   while (new_node->parent->color == RBTREE_RED)
   {
     if (new_node->parent == new_node->parent->parent->left)
     {
-      // new_node의 삼촌노드 색상을 확인한다.
       node_t *temp = new_node->parent->parent->right;
-      // case1) recoloring case
+     
       if (temp->color == RBTREE_RED)
       {
-        // recoloring
         new_node->parent->color = RBTREE_BLACK;
         temp->color = RBTREE_BLACK;
         new_node->parent->parent->color = RBTREE_RED;
@@ -139,11 +150,10 @@ void *left_rotate(rbtree *t, node_t *new_node) {
   {
     new_node->parent->right = temp;
   }
-    temp->left = new_node;
+  temp->left = new_node;
   new_node->parent = temp;
-  }
+}
 
-// 오른쪽으로 회전하는 경우
 void *right_rotate(rbtree *t, node_t *new_node) {
   node_t *temp = new_node->left;
   new_node->left = temp->right;
@@ -153,7 +163,7 @@ void *right_rotate(rbtree *t, node_t *new_node) {
     temp->right->parent = new_node;
   }
   temp->parent = new_node->parent;
-  
+
   if (new_node->parent == t->nil)
   {
     t->root = temp;
@@ -173,13 +183,12 @@ void *right_rotate(rbtree *t, node_t *new_node) {
 node_t *rbtree_find(const rbtree *t, const key_t key) {
   node_t *current = t ->root;
 
-  // 현재 노드가 nil노드가 아닐 때까지
   while (current != t->nil)
   {
     if (key == current->key)
     {
       return current;
-}
+    }
     else if (key > current->key)
     {
       current = current -> right;
@@ -192,31 +201,70 @@ node_t *rbtree_find(const rbtree *t, const key_t key) {
   return NULL;
 }
 
-// 가장 왼쪽으로 이동한다.
 node_t *rbtree_min(const rbtree *t) {
   node_t *current = t->root;
   
   while (current->left != t->nil)
   {
     current = current->left;
-    // printf("now: %d\n", current->key);
   }
   return current;
 }
 
-// 가장 오른쪽으로 이동한다.
 node_t *rbtree_max(const rbtree *t) {
   node_t *current = t->root;
 
   while (current->right != t->nil)
   {
     current = current->right;
-    // printf("now: %d\n", current->right->key);
   }  
   return current;
 }
 
 int rbtree_erase(rbtree *t, node_t *p) {
+  node_t *temp = p;
+  color_t temp_original_color = temp->color;
+  node_t *x;
+
+  if (p->left == t->nil)
+  {
+    x = p->right;
+    rb_transplant(t, p, p->right);
+  } 
+  else if (p->right == t->nil)
+  {
+    x = p->left;
+    rb_transplant(t, p, p->left);
+  }
+  else
+  {
+    temp = tree_minimum(t, p->right);
+    temp_original_color = temp->color;
+    x = temp->right;
+    if (temp->parent == p)
+    {
+      x->parent = temp;
+    }
+    else
+    {
+      rb_transplant(t, temp, temp->right);
+      temp->right = p->right;
+      temp->right->parent = temp;
+    }
+    rb_transplant(t, p, temp);
+    temp->left = p->left;
+    temp->left->parent = temp;
+    temp->color = p->color;
+  }
+  if (temp_original_color == RBTREE_BLACK)
+  {
+    rb_delete_fixup(t, x);
+  }
+  free(p);
+
+  return 0;
+}
+
 node_t *tree_minimum(const rbtree *t, const node_t *p)
 {
   while (p->left != t->nil)
@@ -243,6 +291,77 @@ int rb_transplant(rbtree *t, node_t *u, node_t *v)
   v->parent = u->parent;
 
   return 0;
+}
+
+int rb_delete_fixup(rbtree *t, node_t *x)
+{
+  node_t *w;
+  while (x != t->root && x->color == RBTREE_BLACK)
+  {
+    if (x == x->parent->left)
+    {
+      w = x->parent->right;
+      if (w->color == RBTREE_RED)
+      {
+        w->color = RBTREE_BLACK;
+        x->parent->color = RBTREE_RED;
+        left_rotate(t, x->parent);
+        w = x->parent->right;
+      }
+      if (w->left->color == RBTREE_BLACK && w->right->color == RBTREE_BLACK)
+      {
+        w->color = RBTREE_RED;
+        x = x->parent;
+      }
+      else
+      {
+        if (w->right->color == RBTREE_BLACK)
+        {
+          w->left->color == RBTREE_BLACK;
+          w->color = RBTREE_RED;
+          right_rotate(t, w);
+          w = x->parent->right;
+        }
+        w->color = x->parent->color;
+        x->parent->color = RBTREE_BLACK;
+        w->right->color = RBTREE_BLACK;
+        left_rotate(t, x->parent);
+        x = t->root;
+      }
+    }
+    else
+    {
+      w = x->parent->left;
+      if (w->color == RBTREE_RED)
+      {
+        w->color = RBTREE_BLACK;
+        x->parent->color = RBTREE_RED;
+        right_rotate(t, x->parent);
+        w = x->parent->left;
+      }
+      if (w->right->color == RBTREE_BLACK && w->left->color == RBTREE_BLACK)
+      {
+        w->color = RBTREE_RED;
+        x = x->parent;
+      }
+      else
+      {
+        if (w->left->color == RBTREE_BLACK)
+        {
+          w->right->color == RBTREE_BLACK;
+          w->color = RBTREE_RED;
+          left_rotate(t, w);
+          w = x->parent->left;
+        }
+        w->color = x->parent->color;
+        x->parent->color = RBTREE_BLACK;
+        w->left->color = RBTREE_BLACK;
+        right_rotate(t, x->parent);
+        x = t->root;
+      }
+    }
+  }
+  x->color = RBTREE_BLACK;
 }
 
 int rbtree_to_array(const rbtree *t, key_t *arr, const size_t n) {
