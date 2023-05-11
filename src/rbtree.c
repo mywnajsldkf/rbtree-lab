@@ -265,7 +265,7 @@ int rbtree_erase(rbtree *t, node_t *p) {
   return 0;
 }
 
-node_t *tree_minimum(const rbtree *t, const node_t *p)
+node_t *find_successor(const rbtree *t, const node_t *p)
 {
   while (p->left != t->nil)
   {

@@ -26,7 +26,7 @@ node_t *rbtree_insert_fixup(rbtree *, node_t *);
 node_t *rbtree_find(const rbtree *, const key_t);
 node_t *rbtree_min(const rbtree *);
 node_t *rbtree_max(const rbtree *);
-node_t *tree_minimum(const rbtree *, const node_t *);
+node_t *find_successor(const rbtree *, const node_t *);
 int rbtree_erase(rbtree *, node_t *);
 
 int rbtree_to_array(const rbtree *, key_t *, const size_t);
