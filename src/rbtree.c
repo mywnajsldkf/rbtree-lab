@@ -100,7 +100,6 @@ node_t *rbtree_insert_fixup(rbtree *t, node_t *new_node) {
       right_rotate(t, new_node->parent->parent);  
       }
     }
-    // 반대쪽에 있는 경우
     else
     {
       node_t *temp = new_node->parent->parent->left;
@@ -127,7 +126,6 @@ node_t *rbtree_insert_fixup(rbtree *t, node_t *new_node) {
   return new_node;
 }
 
-// 왼쪽으로 회전하는 경우
 void *left_rotate(rbtree *t, node_t *new_node) {
   node_t *temp = new_node->right;
   new_node->right = temp->left;
@@ -238,7 +236,7 @@ int rbtree_erase(rbtree *t, node_t *p) {
   }
   else
   {
-    temp = tree_minimum(t, p->right);
+    temp = find_successor(t, p->right);
     temp_original_color = temp->color;
     x = temp->right;
     if (temp->parent == p)
